@@ -1,0 +1,35 @@
+# Binaries
+/target/
+
+# Build artifacts
+**/*.rs.bk
+
+# Cargo lock for libraries (giữ lại cho binary project)
+/Cargo.lock
+
+# IDE / Editor
+# VSCode
+.vscode/
+# JetBrains CLion / IntelliJ Rust
+.idea/
+*.iml
+
+# Mac / Linux / Windows junk
+.DS_Store
+*~
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Backup / temp
+*.tmp
+*.swp
+*.swo
+
+# Coverage / test output
+coverage/
+htmlcov/
+*.profraw
+*.profdata
