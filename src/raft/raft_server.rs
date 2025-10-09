@@ -199,6 +199,8 @@ impl RaftServer {
     async fn run_leader_loop(&mut self){
         log::info!("Run Leader Loop");
 
+        self.run_periodic_heartbeat();
+
         loop{
             let state = self.get_state();
             match state {
@@ -259,6 +261,7 @@ impl RaftServer {
             success: true,
         }
     }
+    fn run_periodic_heartbeat(&mut self){}
 }
 
 impl RaftServer {
