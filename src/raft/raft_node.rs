@@ -12,7 +12,7 @@ use crate::raft::election::ElectionResult;
 use crate::Utils::thread_safe_bool::ThreadSafeBool;
 
 pub struct RaftServer{
-    server_id: String,
+    node_id: String,
     node_state: Arc<Mutex<NodeState>>,
     raft_state: Arc<RaftState>,
 
@@ -37,7 +37,7 @@ impl RaftServer {
         let raft_state = Arc::new((RaftState::new()));
         let (shutdown_tx, shutdown_rx) = mpsc::channel(1);
         let server = Self {
-            server_id: config.server_id.clone(),
+            node_id: config.server_id.clone(),
             node_state: Arc::new(Mutex::new(NodeState::Follower)),
             raft_state,
             config,
@@ -81,7 +81,7 @@ impl RaftServer {
     */
 
     async fn start(&mut self){
-        log::info!("Starting loop start {}", self.server_id);
+        log::info!("Starting loop start {}", self.node_id);
         self.running.set(true);
 
         while self.running.get() {
@@ -134,7 +134,7 @@ impl RaftServer {
 
                     tokio::select! {
                         _ = tokio::time::sleep(election_timeout) => {
-                            log::info!("Election time-out. Node {} become candidate", self.server_id);
+                            log::info!("Election time-out. Node {} become candidate", self.node_id);
                             self.become_candidate();
                             election_timeout = self.random_election_timeout();
                         },
@@ -292,15 +292,15 @@ impl RaftServer {
     }
     fn become_follower(&mut self){
         self.set_state(NodeState::Follower);
-        log::info!("Node {} became the follower", self.server_id);
+        log::info!("Node {} became the follower", self.node_id);
     }
     fn become_leader(&mut self){
         self.set_state(NodeState::Leader);
-        log::info!("Node {} became the leader", self.server_id);
+        log::info!("Node {} became the leader", self.node_id);
     }
     fn become_candidate(&mut self) {
         self.set_state(NodeState::Candidate);
-        log::info!("Node {} became the candidate", self.server_id);
+        log::info!("Node {} became the candidate", self.node_id);
     }
     fn quorum_size(&self) -> u64 {
         // TODO: Introduce new configuration for all membership

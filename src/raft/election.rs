@@ -16,6 +16,7 @@ pub async fn grant_vote(
     req: RequestVoteRequest,
     needed_votes: usize,
 ) -> ElectionResult {
+    // tokio::sync::OnceCell
     let req = Arc::new(req);
     let cancel_token = CancellationToken::new();  // Tạo token để cancel
 
