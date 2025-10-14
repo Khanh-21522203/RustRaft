@@ -27,7 +27,6 @@ pub struct RaftState {
     pub last_applied: Mutex<u64>,
 
     state_store: Box<dyn StateStore>,
-    // Storage
 }
 
 impl RaftState {
