@@ -2,10 +2,12 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use rand::Rng;
 use tokio::sync::mpsc;
-use crate::raft::state::{NodeState, RaftState};
+use crate::raft::raft_state::{NodeState, RaftState};
 use crate::grpc::raft_grpc_server::{RaftGrpcRequest, RaftGrpcResponse};
 use crate::raft_grpc::{AppendEntriesRequest, AppendEntriesResponse, RequestVoteRequest, RequestVoteResponse, TimeoutNowResponse};
 use crate::configuration::config::{MembershipConfigurations, NodeConfig};
+use crate::data_store::sled_log::LogStore;
+use crate::data_store::sled_state::StateStore;
 use crate::error::error::RaftError;
 use crate::raft::election;
 use crate::raft::election::ElectionResult;
@@ -15,6 +17,8 @@ pub struct RaftServer{
     node_id: String,
     node_state: Arc<Mutex<NodeState>>,
     raft_state: Arc<RaftState>,
+
+    log_store: Arc<dyn LogStore>,
 
     config: NodeConfig,
     membership_configurations: MembershipConfigurations,
@@ -33,13 +37,16 @@ impl RaftServer {
         config: NodeConfig,
         membership_configurations: MembershipConfigurations,
         rpc_rx: mpsc::Receiver<(RaftGrpcRequest, mpsc::Sender<RaftGrpcResponse>)>,
+        state_store: Box<dyn StateStore>,
+        log_store: Arc<dyn LogStore>,
     ) -> Self {
-        let raft_state = Arc::new((RaftState::new()));
+        let raft_state = Arc::new(RaftState::new(state_store));
         let (shutdown_tx, shutdown_rx) = mpsc::channel(1);
         let server = Self {
             node_id: config.server_id.clone(),
             node_state: Arc::new(Mutex::new(NodeState::Follower)),
             raft_state,
+            log_store,
             config,
             membership_configurations,
             rpc_rx,
@@ -336,9 +343,7 @@ impl RaftServer {
     fn set_voted_for(&self, node_id: Option<String>) {
         self.raft_state.set_voted_for(node_id);
     }
-    async fn get_last_log_term(&self) -> u64 {
-
-    }
+    async fn get_last_log_term(&self) -> u64 { self.log_stor    }
     async fn get_last_log_index(&self) -> u64  {
         self.logs.read().await.last_index()
     }

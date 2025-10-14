@@ -4,18 +4,18 @@ use serde::{de::DeserializeOwned, Serialize};
 use bincode::serde::decode_from_slice;
 use bincode::config;
 
-pub trait MetaDataStore: Send + Sync {
+pub trait StateStore: Send + Sync {
     fn set(&self, key: &str, value: u64) -> Result<(), StoreError>;
     fn get(&self, key: &str) -> Result<Option<u64>, StoreError>;
     fn set_str(&self, key: &str, value: String) -> Result<(), StoreError>;
     fn get_str(&self, key: &str) -> Result<Option<String>, StoreError>;
 }
 
-pub struct SledMetaDataStore {
+pub struct SledStateStore {
     db: Db
 }
 
-impl SledMetaDataStore {
+impl SledStateStore {
     pub fn new(path: &str) -> Result<Self, sled::Error> {
         let config = Config::new()
             .path(path)
@@ -58,7 +58,7 @@ impl SledMetaDataStore {
     }
 }
 
-impl MetaDataStore for SledMetaDataStore {
+impl StateStore for SledStateStore {
     fn set(&self, key: &str, value: u64) -> Result<(), StoreError>{
         self.set(key, &value)
     }

@@ -1,5 +1,6 @@
 use sled::{Config, Db, IVec};
 use crate::error::store_error::StoreError;
+use crate::raft_grpc::LogEntry;
 
 pub trait LogStore: Send + Sync {
     fn get_log(&self, idx: u64) -> Result<Option<LogEntry>, StoreError>;

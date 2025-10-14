@@ -1,3 +1,3 @@
-mod sled_meta_data;
-mod sled_log;
-mod fsm;
+pub mod sled_state;
+pub mod sled_log;
+pub mod fsm;

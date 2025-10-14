@@ -2,6 +2,7 @@ use std::sync::{Arc, RwLock};
 use async_trait::async_trait;
 use log::info;
 use serde::{Deserialize, Serialize};
+use crate::raft_grpc::{LogEntry, LogEntryType};
 
 #[async_trait]
 pub trait FSM: Send + Sync  + 'static {
